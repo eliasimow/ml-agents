@@ -109,6 +109,11 @@ public class CrawlerAgent : Agent
 
         //Random start rotation to help generalize
         body.rotation = Quaternion.Euler(0, Random.Range(0.0f, 360.0f), 0);
+        body.position = transform.position + new Vector3 (
+            Random.Range(-5.0f, 5.0f),
+            Random.Range(0.0f, 5.0f),
+            Random.Range(-5.0f, 5.0f))
+            ;
 
         UpdateOrientationObjects();
 
@@ -287,4 +292,6 @@ public class CrawlerAgent : Agent
     {
         AddReward(1f);
     }
+
+
 }
