@@ -119,6 +119,79 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &283352342
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3925309372585159072, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.9872242
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925309372585159072, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925309372585159072, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.31327033
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925309372585159072, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925309372585159072, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925309372585159072, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925309372585159072, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925309372585159072, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925309372585159072, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925309372585159072, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4409675767907316506, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_Name
+      value: WalkerRagdoll
+      objectReference: {fileID: 0}
+    - target: {fileID: 4409675767907316506, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dd62a2a5a838943fba3d2cbb377a75b3, type: 3}
 --- !u!1001 &593157417
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -132,22 +205,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainStander
       objectReference: {fileID: 0}
-    - target: {fileID: 5979438639897704573, guid: f5810baf8e812fb4b8a169d5833bfe35,
-        type: 3}
-      propertyPath: MaxStep
-      value: 2000
-      objectReference: {fileID: 0}
-    - target: {fileID: 5979438639897704573, guid: f5810baf8e812fb4b8a169d5833bfe35,
-        type: 3}
-      propertyPath: maxEpisodeSteps
-      value: 2000
-      objectReference: {fileID: 0}
-    - target: {fileID: 6499478273555871896, guid: f5810baf8e812fb4b8a169d5833bfe35,
-        type: 3}
-      propertyPath: m_Model
-      value: 
-      objectReference: {fileID: 5022602860645237092, guid: 487dc34a11526fb4e8b09365297e760f,
-        type: 3}
     - target: {fileID: 7291506710382383448, guid: f5810baf8e812fb4b8a169d5833bfe35,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -772,12 +829,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec51f47c5ed0478080c449c74fd9c154, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravityMultiplier: 1.5
+  gravityMultiplier: 1
   fixedDeltaTime: 0.01333
   maximumDeltaTime: 0.15
-  solverIterations: 12
-  solverVelocityIterations: 12
-  reuseCollisionCallbacks: 1
+  solverIterations: 24
+  solverVelocityIterations: 24
+  reuseCollisionCallbacks: 0
 --- !u!114 &1991123029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -818,3 +875,4 @@ SceneRoots:
   - {fileID: 718390423}
   - {fileID: 1863392257}
   - {fileID: 1023984771}
+  - {fileID: 283352342}
