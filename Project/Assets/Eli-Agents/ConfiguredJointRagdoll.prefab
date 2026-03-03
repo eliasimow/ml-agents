@@ -741,6 +741,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -9169014819405191050, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: -8967220861104804094, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b8366edbf18c261448c8136d95b14d54,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -791,10 +801,75 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7879855642006249159, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: -5682088497472049438, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: -3130385668573593812, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: -960356633649629715, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b8366edbf18c261448c8136d95b14d54,
         type: 3}
       propertyPath: m_Name
       value: ConfiguredJointRagdoll
+      objectReference: {fileID: 0}
+    - target: {fileID: 2047973377360827335, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: 2795070813942838150, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: 4294212871594980096, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: 4320680807397987676, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: 4893523429932610734, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: 5793899881836198430, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: 6828702120922229792, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: 7506123340800250720, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: 9196683045312060011, guid: b8366edbf18c261448c8136d95b14d54,
+        type: 3}
+      propertyPath: m_TagString
+      value: agent
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -205,6 +205,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainStander
       objectReference: {fileID: 0}
+    - target: {fileID: 5921951712357743703, guid: f5810baf8e812fb4b8a169d5833bfe35,
+        type: 3}
+      propertyPath: m_Model
+      value: 
+      objectReference: {fileID: 5022602860645237092, guid: 0c3ecbb01127e2a4a8e367644d1b040d,
+        type: 3}
     - target: {fileID: 7291506710382383448, guid: f5810baf8e812fb4b8a169d5833bfe35,
         type: 3}
       propertyPath: m_LocalPosition.x
