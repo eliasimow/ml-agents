@@ -225,6 +225,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: WalkerRagdoll
       objectReference: {fileID: 0}
+    - target: {fileID: 4409675767907316506, guid: dd62a2a5a838943fba3d2cbb377a75b3,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5498727688956813661, guid: dd62a2a5a838943fba3d2cbb377a75b3,
         type: 3}
       propertyPath: targetToLookAt
@@ -366,7 +371,7 @@ PrefabInstance:
     - target: {fileID: 2734713792133317119, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.55
+      value: 0.144
       objectReference: {fileID: 0}
     - target: {fileID: 2734713792133317119, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -413,15 +418,35 @@ PrefabInstance:
       propertyPath: m_Name
       value: ConfiguredJointRagdoll
       objectReference: {fileID: 0}
+    - target: {fileID: 3366571670529088325, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4706101301636990439, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 140846861312608762}
     - target: {fileID: 4706101301636990439, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6179349521316857140, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: targetToLookAt
+      value: 
+      objectReference: {fileID: 140846861312608762}
     - target: {fileID: 7030215126773240506, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_TagString
       value: agent
+      objectReference: {fileID: 0}
+    - target: {fileID: 7044739691048441786, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -7,8 +7,134 @@ using Unity.MLAgents.Sensors;
 using BodyPart = Unity.MLAgentsExamples.BodyPart;
 using Random = UnityEngine.Random;
 
+[System.Serializable]
+public class StoredPose {
+    public Quaternion hips;
+    public Quaternion spine;
+    public Quaternion head;
+
+    public Quaternion thighL;
+    public Quaternion shinL;
+    public Quaternion footL;
+
+    public Quaternion thighR;
+    public Quaternion shinR;
+    public Quaternion footR;
+
+    public Quaternion armL;
+    public Quaternion forearmL;
+    public Quaternion handL;
+
+    public Quaternion armR;
+    public Quaternion forearmR;
+    public Quaternion handR;
+}
 public class StanderThirdTry : Agent {
+    [Header("Reference Pose")]
+    public StoredPose tPose;
+
+    [Header("Reference Pose")]
+    public StoredPose referencePose;
+
+    [ContextMenu("Set T Pose")]
+    public void CaptureTPose() {
+        tPose.hips = hips.localRotation;
+        tPose.spine = spine.localRotation;
+        tPose.head = head.localRotation;
+        
+        tPose.thighL = thighL.localRotation;
+        tPose.shinL = shinL.localRotation;
+        tPose.footL = footL.localRotation;
+        
+        tPose.thighR = thighR.localRotation;
+        tPose.shinR = shinR.localRotation;
+        tPose.footR = footR.localRotation;
+        
+        tPose.armL = armL.localRotation;
+        tPose.forearmL = forearmL.localRotation;
+        tPose.handL = handL.localRotation;
+        
+        tPose.armR = armR.localRotation;
+        tPose.forearmR = forearmR.localRotation;
+        tPose.handR = handR.localRotation;
+
+        Debug.Log("Pose captured.");
+    }
+
+    [ContextMenu("Return to T Pose")]
+    public void ResetPose() {
+        hips.localRotation = tPose.hips;
+        spine.localRotation = tPose.spine;
+        head.localRotation = tPose.head;
+
+        thighL.localRotation = tPose.thighL;
+        shinL.localRotation = tPose.shinL;
+        footL.localRotation = tPose.footL;
+
+        thighR.localRotation = tPose.thighR;
+        shinR.localRotation = tPose.shinR;
+        footR.localRotation = tPose.footR;
+
+        armL.localRotation = tPose.armL;
+        forearmL.localRotation = tPose.forearmL;
+        handL.localRotation = tPose.handL;
+
+        armR.localRotation = tPose.armR;
+        forearmR.localRotation = tPose.forearmR;
+        handR.localRotation = tPose.handR;
+
+        Debug.Log("Pose reset to stored T-pose.");
+    }
+
+    [ContextMenu("Capture Current Pose")]
+    public void CaptureCurrentPose() {
+        referencePose.hips = hips.localRotation;
+        referencePose.spine = spine.localRotation;
+        referencePose.head = head.localRotation;
+
+        referencePose.thighL = thighL.localRotation;
+        referencePose.shinL = shinL.localRotation;
+        referencePose.footL = footL.localRotation;
+
+        referencePose.thighR = thighR.localRotation;
+        referencePose.shinR = shinR.localRotation;
+        referencePose.footR = footR.localRotation;
+
+        referencePose.armL = armL.localRotation;
+        referencePose.forearmL = forearmL.localRotation;
+        referencePose.handL = handL.localRotation;
+
+        referencePose.armR = armR.localRotation;
+        referencePose.forearmR = forearmR.localRotation;
+        referencePose.handR = handR.localRotation;
+
+        Debug.Log("Pose captured.");
+    }
+
     [Header("Target To Walk Towards")] public Transform target; //Target the agent will walk towards during training.
+
+    [Header("Walk Speed")]
+    [Range(0.1f, 10)]
+    [SerializeField]
+    //The walking speed to try and achieve
+    private float m_TargetWalkingSpeed = 10;
+
+    public float MTargetWalkingSpeed // property
+    {
+        get { return m_TargetWalkingSpeed; }
+        set { m_TargetWalkingSpeed = Mathf.Clamp(value, .1f, m_maxWalkingSpeed); }
+    }
+
+    const float m_maxWalkingSpeed = 10; //The max walking speed
+
+    //Should the agent sample a new goal velocity each episode?
+    //If true, walkSpeed will be randomly set between zero and m_maxWalkingSpeed in OnEpisodeBegin()
+    //If false, the goal velocity will be walkingSpeed
+    public bool randomizeWalkSpeedEachEpisode;
+
+    //The direction an agent will walk during training.
+    private Vector3 m_WorldDirToWalk = Vector3.right;
+
 
     [Header("Body Parts")] public Transform hips;
     public Transform spine;
@@ -59,10 +185,6 @@ public class StanderThirdTry : Agent {
 
         m_ResetParams = Academy.Instance.EnvironmentParameters;
     }
-
-    /// <summary>
-    /// Loop over body parts and reset them to initial conditions.
-    /// </summary>
     public override void OnEpisodeBegin() {
         //Reset all of the body parts
         foreach (var bodyPart in m_JdController.bodyPartsDict.Values) {
@@ -73,6 +195,10 @@ public class StanderThirdTry : Agent {
         hips.rotation = Quaternion.Euler(0, Random.Range(0.0f, 360.0f), 0);
 
         UpdateOrientationObjects();
+
+        //Set our goal walking speed
+        MTargetWalkingSpeed =
+            randomizeWalkSpeedEachEpisode ? Random.Range(0.1f, m_maxWalkingSpeed) : MTargetWalkingSpeed;
     }
 
     /// <summary>
@@ -103,12 +229,16 @@ public class StanderThirdTry : Agent {
         var cubeForward = m_OrientationCube.transform.forward;
 
         //velocity we want to match
+        var velGoal = cubeForward * MTargetWalkingSpeed;
         //ragdoll's avg vel
         var avgVel = GetAvgVelocity();
 
         //current ragdoll velocity. normalized
+        sensor.AddObservation(Vector3.Distance(velGoal, avgVel));
         //avg body vel relative to cube
         sensor.AddObservation(m_OrientationCube.transform.InverseTransformDirection(avgVel));
+        //vel goal relative to cube
+        sensor.AddObservation(m_OrientationCube.transform.InverseTransformDirection(velGoal));
 
         //rotation deltas
         sensor.AddObservation(Quaternion.FromToRotation(hips.forward, cubeForward));
@@ -159,6 +289,7 @@ public class StanderThirdTry : Agent {
 
     //Update OrientationCube and DirectionIndicator
     void UpdateOrientationObjects() {
+        m_WorldDirToWalk = target.position - hips.position;
         m_OrientationCube.UpdateOrientation(hips, target);
         if (m_DirectionIndicator) {
             m_DirectionIndicator.MatchOrientation(m_OrientationCube.transform);
@@ -173,6 +304,17 @@ public class StanderThirdTry : Agent {
         // Set reward for this step according to mixture of the following elements.
         // a. Match target speed
         //This reward will approach 1 if it matches perfectly and approach zero as it deviates
+        var matchSpeedReward = GetMatchingVelocityReward(cubeForward * MTargetWalkingSpeed, GetAvgVelocity());
+
+        //Check for NaNs
+        if (float.IsNaN(matchSpeedReward)) {
+            throw new ArgumentException(
+                "NaN in moveTowardsTargetReward.\n" +
+                $" cubeForward: {cubeForward}\n" +
+                $" hips.velocity: {m_JdController.bodyPartsDict[hips].rb.linearVelocity}\n" +
+                $" maximumWalkingSpeed: {m_maxWalkingSpeed}"
+            );
+        }
 
         // b. Rotation alignment with target direction.
         //This reward will approach 1 if it faces the target direction perfectly and approach zero as it deviates
@@ -190,7 +332,7 @@ public class StanderThirdTry : Agent {
             );
         }
 
-        AddReward(lookAtTargetReward);
+        AddReward(matchSpeedReward * lookAtTargetReward);
     }
 
     //Returns the average velocity of all of the body parts
@@ -208,6 +350,16 @@ public class StanderThirdTry : Agent {
 
         var avgVel = velSum / numOfRb;
         return avgVel;
+    }
+
+    //normalized value of the difference in avg speed vs goal walking speed.
+    public float GetMatchingVelocityReward(Vector3 velocityGoal, Vector3 actualVelocity) {
+        //distance between our actual velocity and goal velocity
+        var velDeltaMagnitude = Mathf.Clamp(Vector3.Distance(actualVelocity, velocityGoal), 0, MTargetWalkingSpeed);
+
+        //return the value on a declining sigmoid shaped curve that decays from 1 to 0
+        //This reward will approach 1 if it matches perfectly and approach zero as it deviates
+        return Mathf.Pow(1 - Mathf.Pow(velDeltaMagnitude / MTargetWalkingSpeed, 2), 2);
     }
 
     /// <summary>
