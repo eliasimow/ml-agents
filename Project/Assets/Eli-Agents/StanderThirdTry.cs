@@ -6,6 +6,10 @@ using Unity.MLAgentsExamples;
 using Unity.MLAgents.Sensors;
 using BodyPart = Unity.MLAgentsExamples.BodyPart;
 using Random = UnityEngine.Random;
+using System.Collections.Generic;
+using UnityEngine.InputSystem;
+using UnityEditor;
+using UnityEngine.Profiling;
 
 [System.Serializable]
 public class StoredPose {
@@ -30,11 +34,14 @@ public class StoredPose {
     public Quaternion handR;
 }
 public class StanderThirdTry : Agent {
-    [Header("Reference Pose")]
+    [Header("T Pose")]
     public StoredPose tPose;
 
+    [Header("Rest Pose")]
+    public StoredPose restPose;
+
     [Header("Reference Pose")]
-    public StoredPose referencePose;
+    public List<StoredPose> referencePoses;
 
     [ContextMenu("Set T Pose")]
     public void CaptureTPose() {
@@ -59,6 +66,56 @@ public class StanderThirdTry : Agent {
         tPose.handR = handR.localRotation;
 
         Debug.Log("Pose captured.");
+    }
+
+    [ContextMenu("Set Rest Pose")]
+    public void CaptureRestPose() {
+        restPose.hips = hips.localRotation;
+        restPose.spine = spine.localRotation;
+        restPose.head = head.localRotation;
+        
+        restPose.thighL = thighL.localRotation;
+        restPose.shinL = shinL.localRotation;
+        restPose.footL = footL.localRotation;
+        
+        restPose.thighR = thighR.localRotation;
+        restPose.shinR = shinR.localRotation;
+        restPose.footR = footR.localRotation;
+        
+        restPose.armL = armL.localRotation;
+        restPose.forearmL = forearmL.localRotation;
+        restPose.handL = handL.localRotation;
+        
+        restPose.armR = armR.localRotation;
+        restPose.forearmR = forearmR.localRotation;
+        restPose.handR = handR.localRotation;
+
+        Debug.Log("Pose captured.");
+    }
+
+    [ContextMenu("Return to Rest Pose")]
+    public void ToRestPose() {
+        hips.localRotation = restPose.hips;
+        spine.localRotation = restPose.spine;
+        head.localRotation = restPose.head;
+
+        thighL.localRotation = restPose.thighL;
+        shinL.localRotation = restPose.shinL;
+        footL.localRotation = restPose.footL;
+
+        thighR.localRotation = restPose.thighR;
+        shinR.localRotation = restPose.shinR;
+        footR.localRotation = restPose.footR;
+
+        armL.localRotation = restPose.armL;
+        forearmL.localRotation = restPose.forearmL;
+        handL.localRotation = restPose.handL;
+
+        armR.localRotation = restPose.armR;
+        forearmR.localRotation = restPose.forearmR;
+        handR.localRotation = restPose.handR;
+
+        Debug.Log("Pose reset to stored T-pose.");
     }
 
     [ContextMenu("Return to T Pose")]
@@ -88,6 +145,8 @@ public class StanderThirdTry : Agent {
 
     [ContextMenu("Capture Current Pose")]
     public void CaptureCurrentPose() {
+        StoredPose referencePose = new StoredPose();
+
         referencePose.hips = hips.localRotation;
         referencePose.spine = spine.localRotation;
         referencePose.head = head.localRotation;
@@ -108,7 +167,34 @@ public class StanderThirdTry : Agent {
         referencePose.forearmR = forearmR.localRotation;
         referencePose.handR = handR.localRotation;
 
+        referencePoses.Add(referencePose);
         Debug.Log("Pose captured.");
+    }
+
+    [ContextMenu("Return to Reference Pose")]
+    public void ToReferencePose() {
+        StoredPose referencePose = referencePoses[0];
+        hips.localRotation = referencePose.hips;
+        spine.localRotation = referencePose.spine;
+        head.localRotation = referencePose.head;
+
+        thighL.localRotation = referencePose.thighL;
+        shinL.localRotation = referencePose.shinL;
+        footL.localRotation = referencePose.footL;
+
+        thighR.localRotation = referencePose.thighR;
+        shinR.localRotation = referencePose.shinR;
+        footR.localRotation = referencePose.footR;
+
+        armL.localRotation = referencePose.armL;
+        forearmL.localRotation = referencePose.forearmL;
+        handL.localRotation = referencePose.handL;
+
+        armR.localRotation = referencePose.armR;
+        forearmR.localRotation = referencePose.forearmR;
+        handR.localRotation = referencePose.handR;
+
+        Debug.Log("Pose reset to stored T-pose.");
     }
 
     [Header("Target To Walk Towards")] public Transform target; //Target the agent will walk towards during training.
@@ -161,6 +247,8 @@ public class StanderThirdTry : Agent {
     JointDriveController m_JdController;
     EnvironmentParameters m_ResetParams;
 
+    float timeInLoop = 0.0f;
+
     public override void Initialize() {
         m_OrientationCube = GetComponentInChildren<OrientationCubeController>();
         m_DirectionIndicator = GetComponentInChildren<DirectionIndicator>();
@@ -185,16 +273,22 @@ public class StanderThirdTry : Agent {
 
         m_ResetParams = Academy.Instance.EnvironmentParameters;
     }
+
     public override void OnEpisodeBegin() {
         //Reset all of the body parts
         foreach (var bodyPart in m_JdController.bodyPartsDict.Values) {
             bodyPart.Reset(bodyPart);
         }
 
+        ToRestPose();
+        
         //Random start rotation to help generalize
-        hips.rotation = Quaternion.Euler(0, Random.Range(0.0f, 360.0f), 0);
+   //     hips.rotation = Quaternion.Euler(hips.rotation.x, Random.Range(0.0f, 360.0f), hips.rotation.z);
+        Debug.Log("randomized");
 
         UpdateOrientationObjects();
+
+        timeInLoop = 0.0f;
 
         //Set our goal walking speed
         MTargetWalkingSpeed =
@@ -295,10 +389,38 @@ public class StanderThirdTry : Agent {
             m_DirectionIndicator.MatchOrientation(m_OrientationCube.transform);
         }
     }
-
     void FixedUpdate() {
+        //    Vector3 input = new Vector3(
+        //    Input.GetAxis("Horizontal"),
+        //    0,
+        //    Input.GetAxis("Vertical")
+        //);
+
+        //foreach (var bodyPart in m_JdController.bodyPartsList) {
+        //    if (!bodyPart.Equals(hips)) {
+        //        float h = Input.GetAxis("Horizontal"); // A/D
+        //        float v = Input.GetAxis("Vertical");   // W/S
+
+        //        // Update rotation
+        //        currentEuler.x += v * rotationSpeed * Time.fixedDeltaTime; // pitch
+        //        currentEuler.y += h * rotationSpeed * Time.fixedDeltaTime; // yaw
+
+
+        //        bodyPart.SetJointTargetRotation(currentEuler.x, currentEuler.y, currentEuler.z);
+        //        bodyPart.SetJointStrength(1.0f);             
+        //    }
+        //}
+
+
         UpdateOrientationObjects();
 
+        timeInLoop += Time.fixedDeltaTime;
+
+        AddReward(GetPoseTrackingReward(Time.fixedDeltaTime)/10.0f);
+        CheckPoseCompletion();
+        return;
+
+        /*
         var cubeForward = m_OrientationCube.transform.forward;
 
         // Set reward for this step according to mixture of the following elements.
@@ -333,6 +455,7 @@ public class StanderThirdTry : Agent {
         }
 
         AddReward(matchSpeedReward * lookAtTargetReward);
+        */
     }
 
     //Returns the average velocity of all of the body parts
@@ -367,5 +490,97 @@ public class StanderThirdTry : Agent {
     /// </summary>
     public void TouchedTarget() {
         AddReward(1f);
+    }
+
+    float GetPoseTrackingReward(float deltaTime) {
+        float best = 0f;
+
+        foreach (var pose in referencePoses) {
+            float sim = PoseSimilarity(pose); // your previous function (0–1)
+            if (sim > best) best = sim;
+        }
+
+        // Shape it so it strongly prefers high similarity
+        float shaped = best * best;
+
+        // Scale by time so reward/sec is consistent
+        return shaped * deltaTime;
+    }
+
+    void CheckPoseCompletion() {
+        float best = 0f;
+
+        foreach (var pose in referencePoses) {
+            float sim = PoseSimilarity(pose);
+            if (sim > best) best = sim;
+        }
+
+        const float SUCCESS_THRESHOLD = 0.98f;
+        const float MAX_TIME = 12.0f;
+
+        if (best >= SUCCESS_THRESHOLD) {
+            float t = Mathf.Clamp01(timeInLoop / MAX_TIME);
+
+            float timeMultiplier = Mathf.Pow(1.0f - t, 2f);
+
+            float reward = 10.0f * timeMultiplier;
+
+            AddReward(reward);
+
+            Debug.Log($"Done! {best:F3} | t={timeInLoop:F2}s | reward={reward:F2}");
+            EndEpisode();
+        }
+    }
+    float QuaternionSimilarity(Quaternion a, Quaternion b) {
+        float similarity = Mathf.Abs(Quaternion.Dot(a, b)); // 1 = identical
+        return similarity;
+    }
+    Quaternion RemoveYaw(Quaternion q) {
+        Vector3 forward = q * Vector3.forward;
+        forward.y = 0f;
+
+        if (forward.sqrMagnitude < 1e-6f)
+            return Quaternion.identity;
+
+        return Quaternion.LookRotation(forward.normalized, Vector3.up);
+    }
+
+    float PoseSimilarity(StoredPose refPose) {
+        float total = 0f;
+        float weightSum = 0f;
+
+        void Add(float sim, float w) {
+            total += sim * w;
+            weightSum += w;
+        }
+
+        // --- HIPS (ignore Y rotation) ---
+        Quaternion hipsCurrent = RemoveYaw(hips.localRotation);
+        Quaternion hipsRef = RemoveYaw(refPose.hips);
+        Add(QuaternionSimilarity(hipsCurrent, hipsRef), 4.0f); // MOST IMPORTANT
+
+        // --- CORE ---
+        Add(QuaternionSimilarity(spine.localRotation, refPose.spine), 3.0f);
+        Add(QuaternionSimilarity(head.localRotation, refPose.head), 1.0f);
+
+        // --- LEGS (very important for standing) ---
+        Add(QuaternionSimilarity(thighL.localRotation, refPose.thighL), 2.5f);
+        Add(QuaternionSimilarity(shinL.localRotation, refPose.shinL), 2.0f);
+        Add(QuaternionSimilarity(footL.localRotation, refPose.footL), 1.5f);
+
+        Add(QuaternionSimilarity(thighR.localRotation, refPose.thighR), 2.5f);
+        Add(QuaternionSimilarity(shinR.localRotation, refPose.shinR), 2.0f);
+        Add(QuaternionSimilarity(footR.localRotation, refPose.footR), 1.5f);
+
+        // --- ARMS (useful for pushing, but less critical) ---
+        Add(QuaternionSimilarity(armL.localRotation, refPose.armL), 1.2f);
+        Add(QuaternionSimilarity(forearmL.localRotation, refPose.forearmL), 1.0f);
+        Add(QuaternionSimilarity(handL.localRotation, refPose.handL), 0.5f);
+
+        Add(QuaternionSimilarity(armR.localRotation, refPose.armR), 1.2f);
+        Add(QuaternionSimilarity(forearmR.localRotation, refPose.forearmR), 1.0f);
+        Add(QuaternionSimilarity(handR.localRotation, refPose.handR), 0.5f);
+
+        return total / weightSum; // still 0–1
     }
 }
