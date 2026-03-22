@@ -248,6 +248,8 @@ public class StanderThirdTry : Agent {
     EnvironmentParameters m_ResetParams;
 
     float timeInLoop = 0.0f;
+    float maxTimeInPose = 0.0f;
+    float timeInPoseProximity = 0.0f;
 
     public override void Initialize() {
         m_OrientationCube = GetComponentInChildren<OrientationCubeController>();
@@ -283,16 +285,19 @@ public class StanderThirdTry : Agent {
         ToRestPose();
         
         //Random start rotation to help generalize
-   //     hips.rotation = Quaternion.Euler(hips.rotation.x, Random.Range(0.0f, 360.0f), hips.rotation.z);
-        Debug.Log("randomized");
+       // hips.rotation = Quaternion.Euler(hips.rotation.x, Random.Range(0.0f, 360.0f), hips.rotation.z);
+        Debug.Log("Max Time was: " + maxTimeInPose);
 
         UpdateOrientationObjects();
 
         timeInLoop = 0.0f;
+        maxTimeInPose = 0.0f;
 
         //Set our goal walking speed
         MTargetWalkingSpeed =
             randomizeWalkSpeedEachEpisode ? Random.Range(0.1f, m_maxWalkingSpeed) : MTargetWalkingSpeed;
+
+        timeInPoseProximity = 0.0f;
     }
 
     /// <summary>
@@ -353,18 +358,18 @@ public class StanderThirdTry : Agent {
         var continuousActions = actionBuffers.ContinuousActions;
         bpDict[spine].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
 
-        bpDict[thighL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], 0);
-        bpDict[thighR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], 0);
-        bpDict[shinL].SetJointTargetRotation(continuousActions[++i], 0, 0);
-        bpDict[shinR].SetJointTargetRotation(continuousActions[++i], 0, 0);
+        bpDict[thighL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        bpDict[thighR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        bpDict[shinL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        bpDict[shinR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
         bpDict[footR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
         bpDict[footL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
 
-        bpDict[armL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], 0);
-        bpDict[armR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], 0);
-        bpDict[forearmL].SetJointTargetRotation(continuousActions[++i], 0, 0);
-        bpDict[forearmR].SetJointTargetRotation(continuousActions[++i], 0, 0);
-        bpDict[head].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], 0);
+        bpDict[armL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        bpDict[armR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        bpDict[forearmL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        bpDict[forearmR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        bpDict[head].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
 
         //update joint strength settings
         bpDict[spine].SetJointStrength(continuousActions[++i]);
@@ -389,6 +394,9 @@ public class StanderThirdTry : Agent {
             m_DirectionIndicator.MatchOrientation(m_OrientationCube.transform);
         }
     }
+
+    //Vector3 currentEuler = new Vector3();
+    //float rotationSpeed = 1.0f;
     void FixedUpdate() {
         //    Vector3 input = new Vector3(
         //    Input.GetAxis("Horizontal"),
@@ -396,20 +404,18 @@ public class StanderThirdTry : Agent {
         //    Input.GetAxis("Vertical")
         //);
 
-        //foreach (var bodyPart in m_JdController.bodyPartsList) {
-        //    if (!bodyPart.Equals(hips)) {
-        //        float h = Input.GetAxis("Horizontal"); // A/D
-        //        float v = Input.GetAxis("Vertical");   // W/S
+        //float h = Input.GetAxis("Horizontal"); // A/D
+        //float v = Input.GetAxis("Vertical");   // W/S
 
-        //        // Update rotation
-        //        currentEuler.x += v * rotationSpeed * Time.fixedDeltaTime; // pitch
-        //        currentEuler.y += h * rotationSpeed * Time.fixedDeltaTime; // yaw
+        //// Update rotation
+        //currentEuler.x += v * rotationSpeed * Time.fixedDeltaTime; // pitch
+        //currentEuler.y += h * rotationSpeed * Time.fixedDeltaTime; // yaw
 
+        //var bpDict = m_JdController.bodyPartsDict;
+        //Debug.Log("is " + currentEuler.x + "," + currentEuler.y + "," + currentEuler.z);
+        //bpDict[shinR].SetJointTargetRotation(currentEuler.x, currentEuler.y, currentEuler.z);
+        //bpDict[shinR].SetJointStrength(1.0f);
 
-        //        bodyPart.SetJointTargetRotation(currentEuler.x, currentEuler.y, currentEuler.z);
-        //        bodyPart.SetJointStrength(1.0f);             
-        //    }
-        //}
 
 
         UpdateOrientationObjects();
@@ -504,7 +510,7 @@ public class StanderThirdTry : Agent {
         float shaped = best * best;
 
         // Scale by time so reward/sec is consistent
-        return shaped * deltaTime;
+        return shaped * deltaTime * (1.0f + timeInPoseProximity);
     }
 
     void CheckPoseCompletion() {
@@ -515,20 +521,28 @@ public class StanderThirdTry : Agent {
             if (sim > best) best = sim;
         }
 
-        const float SUCCESS_THRESHOLD = 0.98f;
+        const float SUCCESS_THRESHOLD = 0.99f;
+        const float POSE_TIME_THRESHOLD = 1.0f;
         const float MAX_TIME = 12.0f;
 
         if (best >= SUCCESS_THRESHOLD) {
-            float t = Mathf.Clamp01(timeInLoop / MAX_TIME);
+            timeInPoseProximity += Time.fixedDeltaTime;
+            maxTimeInPose = Mathf.Max(maxTimeInPose, timeInPoseProximity);
 
-            float timeMultiplier = Mathf.Pow(1.0f - t, 2f);
+            if (timeInPoseProximity > POSE_TIME_THRESHOLD) {
+                float t = Mathf.Clamp01(timeInLoop / MAX_TIME);
 
-            float reward = 10.0f * timeMultiplier;
+                float timeMultiplier = Mathf.Pow(1.0f - t, 2f);
 
-            AddReward(reward);
+                float reward = 10.0f * timeMultiplier;
 
-            Debug.Log($"Done! {best:F3} | t={timeInLoop:F2}s | reward={reward:F2}");
-            EndEpisode();
+                AddReward(reward);
+
+                Debug.Log($"Done! {best:F3} | t={timeInLoop:F2}s | reward={reward:F2}");
+                EndEpisode();
+            }
+        } else {
+            timeInPoseProximity = 0.0f;
         }
     }
     float QuaternionSimilarity(Quaternion a, Quaternion b) {
@@ -555,9 +569,9 @@ public class StanderThirdTry : Agent {
         }
 
         // --- HIPS (ignore Y rotation) ---
-        Quaternion hipsCurrent = RemoveYaw(hips.localRotation);
-        Quaternion hipsRef = RemoveYaw(refPose.hips);
-        Add(QuaternionSimilarity(hipsCurrent, hipsRef), 4.0f); // MOST IMPORTANT
+        //Quaternion hipsCurrent = RemoveYaw(hips.localRotation);
+        //Quaternion hipsRef = RemoveYaw(refPose.hips);
+        Add(QuaternionSimilarity(hips.localRotation, refPose.hips), 4.0f); // MOST IMPORTANT
 
         // --- CORE ---
         Add(QuaternionSimilarity(spine.localRotation, refPose.spine), 3.0f);

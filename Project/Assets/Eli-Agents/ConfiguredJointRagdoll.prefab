@@ -1159,8 +1159,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.12519
-  m_Height: 0.41730002
+  m_Radius: 0.05
+  m_Height: 0.3
   m_Direction: 1
   m_Center: {x: 0, y: -0.20865001, z: 0}
 --- !u!54 &5550209534252951583
@@ -2326,6 +2326,39 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 1000
+  tPose:
+    hips: {x: 0, y: 0, z: 0, w: 0}
+    spine: {x: 0, y: 0, z: 0, w: 0}
+    head: {x: 0, y: 0, z: 0, w: 0}
+    thighL: {x: 0, y: 0, z: 0, w: 0}
+    shinL: {x: 0, y: 0, z: 0, w: 0}
+    footL: {x: 0, y: 0, z: 0, w: 0}
+    thighR: {x: 0, y: 0, z: 0, w: 0}
+    shinR: {x: 0, y: 0, z: 0, w: 0}
+    footR: {x: 0, y: 0, z: 0, w: 0}
+    armL: {x: 0, y: 0, z: 0, w: 0}
+    forearmL: {x: 0, y: 0, z: 0, w: 0}
+    handL: {x: 0, y: 0, z: 0, w: 0}
+    armR: {x: 0, y: 0, z: 0, w: 0}
+    forearmR: {x: 0, y: 0, z: 0, w: 0}
+    handR: {x: 0, y: 0, z: 0, w: 0}
+  restPose:
+    hips: {x: 0, y: 0, z: 0, w: 0}
+    spine: {x: 0, y: 0, z: 0, w: 0}
+    head: {x: 0, y: 0, z: 0, w: 0}
+    thighL: {x: 0, y: 0, z: 0, w: 0}
+    shinL: {x: 0, y: 0, z: 0, w: 0}
+    footL: {x: 0, y: 0, z: 0, w: 0}
+    thighR: {x: 0, y: 0, z: 0, w: 0}
+    shinR: {x: 0, y: 0, z: 0, w: 0}
+    footR: {x: 0, y: 0, z: 0, w: 0}
+    armL: {x: 0, y: 0, z: 0, w: 0}
+    forearmL: {x: 0, y: 0, z: 0, w: 0}
+    handL: {x: 0, y: 0, z: 0, w: 0}
+    armR: {x: 0, y: 0, z: 0, w: 0}
+    forearmR: {x: 0, y: 0, z: 0, w: 0}
+    handR: {x: 0, y: 0, z: 0, w: 0}
+  referencePoses: []
   target: {fileID: 0}
   m_TargetWalkingSpeed: 10
   randomizeWalkSpeedEachEpisode: 0
@@ -2757,8 +2790,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.12519
-  m_Height: 0.41730002
+  m_Radius: 0.05
+  m_Height: 0.3
   m_Direction: 1
   m_Center: {x: 0, y: -0.20865001, z: 0}
 --- !u!54 &8032691673036402761
