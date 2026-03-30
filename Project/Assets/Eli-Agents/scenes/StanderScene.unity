@@ -346,6 +346,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainStander
       objectReference: {fileID: 0}
+    - target: {fileID: 2054014159415927039, guid: f5810baf8e812fb4b8a169d5833bfe35,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3201629229874005955, guid: f5810baf8e812fb4b8a169d5833bfe35,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6255905188189079318, guid: f5810baf8e812fb4b8a169d5833bfe35,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6663488686593354634, guid: f5810baf8e812fb4b8a169d5833bfe35,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7291506710382383448, guid: f5810baf8e812fb4b8a169d5833bfe35,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -396,6 +416,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7759023442155388541, guid: f5810baf8e812fb4b8a169d5833bfe35,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712148696768371421, guid: f5810baf8e812fb4b8a169d5833bfe35,
+        type: 3}
+      propertyPath: m_Model
+      value: 
+      objectReference: {fileID: 5022602860645237092, guid: 80e80ffb3f22c464b99a75d009c7ce7b,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

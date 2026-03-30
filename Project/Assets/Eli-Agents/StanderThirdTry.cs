@@ -249,7 +249,9 @@ public class StanderThirdTry : Agent {
 
     float timeInLoop = 0.0f;
     float maxTimeInPose = 0.0f;
+    float closest = 0.0f;
     float timeInPoseProximity = 0.0f;
+    float highestHeadPosition = 0.0f;
 
     public override void Initialize() {
         m_OrientationCube = GetComponentInChildren<OrientationCubeController>();
@@ -276,22 +278,54 @@ public class StanderThirdTry : Agent {
         m_ResetParams = Academy.Instance.EnvironmentParameters;
     }
 
+    Quaternion SmallRandomRotation(float maxAngle) {
+        Vector3 axis = Random.onUnitSphere;
+        float angle = Random.Range(-maxAngle, maxAngle);
+        return Quaternion.AngleAxis(angle, axis);
+    }
+
     public override void OnEpisodeBegin() {
         //Reset all of the body parts
         foreach (var bodyPart in m_JdController.bodyPartsDict.Values) {
             bodyPart.Reset(bodyPart);
         }
 
-        ToRestPose();
-        
+        ToReferencePose();
+
+
+        //float maxAngle = 145.0f;
+        //hips.localRotation *= SmallRandomRotation(10.0f);
+        //spine.localRotation *= SmallRandomRotation(maxAngle);
+        //head.localRotation *= SmallRandomRotation(maxAngle);
+
+        //thighL.localRotation *= SmallRandomRotation(maxAngle);
+        //shinL.localRotation *= SmallRandomRotation(maxAngle);
+        //footL.localRotation *= SmallRandomRotation(maxAngle);
+
+        //thighR.localRotation *= SmallRandomRotation(maxAngle);
+        //shinR.localRotation *= SmallRandomRotation(maxAngle);
+        //footR.localRotation *= SmallRandomRotation(maxAngle);
+
+        //armL.localRotation *= SmallRandomRotation(maxAngle);
+        //forearmL.localRotation *= SmallRandomRotation(maxAngle);
+        //handL.localRotation *= SmallRandomRotation(maxAngle);
+
+        //armR.localRotation *= SmallRandomRotation(maxAngle);
+        //forearmR.localRotation *= SmallRandomRotation(maxAngle);
+        //handR.localRotation *= SmallRandomRotation(maxAngle);
+
         //Random start rotation to help generalize
-       // hips.rotation = Quaternion.Euler(hips.rotation.x, Random.Range(0.0f, 360.0f), hips.rotation.z);
-        Debug.Log("Max Time was: " + maxTimeInPose);
+        // hips.rotation = Quaternion.Euler(hips.rotation.x, Random.Range(0.0f, 360.0f), hips.rotation.z);
+        //  Debug.Log("Max Time was: " + maxTimeInPose +", closest was " + closest);
+        Debug.Log("Highest head was: " + highestHeadPosition);
+
 
         UpdateOrientationObjects();
 
         timeInLoop = 0.0f;
+        closest = 0.0f;
         maxTimeInPose = 0.0f;
+        highestHeadPosition = 0.0f;
 
         //Set our goal walking speed
         MTargetWalkingSpeed =
@@ -333,7 +367,7 @@ public class StanderThirdTry : Agent {
         var avgVel = GetAvgVelocity();
 
         //current ragdoll velocity. normalized
-        sensor.AddObservation(Vector3.Distance(velGoal, avgVel));
+        sensor.AddObservation(head.transform.position.y);
         //avg body vel relative to cube
         sensor.AddObservation(m_OrientationCube.transform.InverseTransformDirection(avgVel));
         //vel goal relative to cube
@@ -415,15 +449,18 @@ public class StanderThirdTry : Agent {
         //Debug.Log("is " + currentEuler.x + "," + currentEuler.y + "," + currentEuler.z);
         //bpDict[shinR].SetJointTargetRotation(currentEuler.x, currentEuler.y, currentEuler.z);
         //bpDict[shinR].SetJointStrength(1.0f);
+        highestHeadPosition = Mathf.Max(highestHeadPosition, head.transform.position.y);
 
 
 
         UpdateOrientationObjects();
 
         timeInLoop += Time.fixedDeltaTime;
+        
+        //AddReward(GetPoseTrackingReward(Time.fixedDeltaTime, 1) * 5.0f);
+      //  CheckPoseCompletion(0);
 
-        AddReward(GetPoseTrackingReward(Time.fixedDeltaTime)/10.0f);
-        CheckPoseCompletion();
+        AddHeightReward();
         return;
 
         /*
@@ -464,6 +501,15 @@ public class StanderThirdTry : Agent {
         */
     }
 
+    void AddHeightReward() {
+        if (head.transform.position.y >= 2.50f) {
+            EndEpisode();
+            return;
+        }
+
+        AddReward(Mathf.Pow(head.transform.position.y,3) * Time.fixedDeltaTime * 2.5f);
+    }
+
     //Returns the average velocity of all of the body parts
     //Using the velocity of the hips only has shown to result in more erratic movement from the limbs, so...
     //...using the average helps prevent this erratic movement
@@ -498,30 +544,31 @@ public class StanderThirdTry : Agent {
         AddReward(1f);
     }
 
-    float GetPoseTrackingReward(float deltaTime) {
+    float GetPoseTrackingReward(float deltaTime, int referenceIdx) {
         float best = 0f;
 
-        foreach (var pose in referencePoses) {
-            float sim = PoseSimilarity(pose); // your previous function (0–1)
-            if (sim > best) best = sim;
-        }
+        var pose = referencePoses[referenceIdx];
+        float sim = PoseSimilarity(pose); // your previous function (0–1)
+        if (sim > best) best = sim;
+        
 
         // Shape it so it strongly prefers high similarity
         float shaped = best * best;
 
         // Scale by time so reward/sec is consistent
+        closest = Mathf.Max(shaped, closest);
         return shaped * deltaTime * (1.0f + timeInPoseProximity);
     }
 
-    void CheckPoseCompletion() {
+    void CheckPoseCompletion(int referencePoseIdx) {
         float best = 0f;
 
-        foreach (var pose in referencePoses) {
-            float sim = PoseSimilarity(pose);
-            if (sim > best) best = sim;
-        }
+        var pose = referencePoses[referencePoseIdx];
+        float sim = PoseSimilarity(pose);
+        if (sim > best) best = sim;
+        
 
-        const float SUCCESS_THRESHOLD = 0.99f;
+        const float SUCCESS_THRESHOLD = 0.96f;
         const float POSE_TIME_THRESHOLD = 1.0f;
         const float MAX_TIME = 12.0f;
 
@@ -534,7 +581,7 @@ public class StanderThirdTry : Agent {
 
                 float timeMultiplier = Mathf.Pow(1.0f - t, 2f);
 
-                float reward = 10.0f * timeMultiplier;
+                float reward = 100.0f * timeMultiplier;
 
                 AddReward(reward);
 
