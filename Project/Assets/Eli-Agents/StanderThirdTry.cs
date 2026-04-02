@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEditor;
 using UnityEngine.Profiling;
+using System.Linq;
 
 [System.Serializable]
 public class StoredPose {
@@ -221,6 +222,11 @@ public class StanderThirdTry : Agent {
     //The direction an agent will walk during training.
     private Vector3 m_WorldDirToWalk = Vector3.right;
 
+    List<GroundContact> groundContacts;
+    List<GroundContact> shouldTouchGroundContacts;
+    List<GroundContact> shouldNotTouchGroundContacts;
+
+
 
     [Header("Body Parts")] public Transform hips;
     public Transform spine;
@@ -252,6 +258,9 @@ public class StanderThirdTry : Agent {
     float closest = 0.0f;
     float timeInPoseProximity = 0.0f;
     float highestHeadPosition = 0.0f;
+    float timeOffGround = 0.0f;
+    bool hasShouldNotTouching = false;
+    bool hasShouldTouching = false;
 
     public override void Initialize() {
         m_OrientationCube = GetComponentInChildren<OrientationCubeController>();
@@ -276,6 +285,11 @@ public class StanderThirdTry : Agent {
         m_JdController.SetupBodyPart(handR);
 
         m_ResetParams = Academy.Instance.EnvironmentParameters;
+
+        groundContacts = GetComponentsInChildren<GroundContact>().ToList();
+
+        shouldNotTouchGroundContacts = new() { thighL.GetComponent<GroundContact>() , thighR.GetComponent<GroundContact>(), shinL.GetComponent<GroundContact>(), shinR.GetComponent<GroundContact>(), hips.GetComponent<GroundContact>() };
+        shouldTouchGroundContacts = new() { handL.GetComponent<GroundContact>(), handR.GetComponent<GroundContact>() };
     }
 
     Quaternion SmallRandomRotation(float maxAngle) {
@@ -317,8 +331,8 @@ public class StanderThirdTry : Agent {
         //Random start rotation to help generalize
         // hips.rotation = Quaternion.Euler(hips.rotation.x, Random.Range(0.0f, 360.0f), hips.rotation.z);
         //  Debug.Log("Max Time was: " + maxTimeInPose +", closest was " + closest);
-        Debug.Log("Highest head was: " + highestHeadPosition);
-
+        // Debug.Log("Highest head was: " + highestHeadPosition);
+        Debug.Log("GOD!! Help GOD!! GOD!! " + highestHeadPosition + "  GOD !!");
 
         UpdateOrientationObjects();
 
@@ -326,6 +340,9 @@ public class StanderThirdTry : Agent {
         closest = 0.0f;
         maxTimeInPose = 0.0f;
         highestHeadPosition = 0.0f;
+        timeOffGround = 0.0f;
+        hasShouldNotTouching = false;
+        hasShouldTouching = false;
 
         //Set our goal walking speed
         MTargetWalkingSpeed =
@@ -369,9 +386,21 @@ public class StanderThirdTry : Agent {
         //current ragdoll velocity. normalized
         sensor.AddObservation(head.transform.position.y);
         //avg body vel relative to cube
-        sensor.AddObservation(m_OrientationCube.transform.InverseTransformDirection(avgVel));
+        //sensor.AddObservation(m_OrientationCube.transform.InverseTransformDirection(avgVel));
         //vel goal relative to cube
-        sensor.AddObservation(m_OrientationCube.transform.InverseTransformDirection(velGoal));
+        // sensor.AddObservation(m_OrientationCube.transform.InverseTransformDirection(velGoal));
+
+        //which of not touching are true?
+        //4
+        foreach(GroundContact g in shouldNotTouchGroundContacts) {
+            sensor.AddObservation(g.touchingGround);
+        }
+
+        //2
+        foreach (GroundContact g in shouldTouchGroundContacts) {
+            sensor.AddObservation(g.touchingGround);
+        }
+
 
         //rotation deltas
         sensor.AddObservation(Quaternion.FromToRotation(hips.forward, cubeForward));
@@ -458,9 +487,10 @@ public class StanderThirdTry : Agent {
         timeInLoop += Time.fixedDeltaTime;
         
         //AddReward(GetPoseTrackingReward(Time.fixedDeltaTime, 1) * 5.0f);
-      //  CheckPoseCompletion(0);
+        //CheckPoseCompletion(0);
 
         AddHeightReward();
+        EndIfNotTouching();
         return;
 
         /*
@@ -503,13 +533,52 @@ public class StanderThirdTry : Agent {
 
     void AddHeightReward() {
         if (head.transform.position.y >= 2.50f) {
-            EndEpisode();
-            return;
+        //    EndEpisode();
+        //    return;
         }
 
         AddReward(Mathf.Pow(head.transform.position.y,3) * Time.fixedDeltaTime * 2.5f);
     }
 
+    void EndIfNotTouching() {
+        if(timeInLoop < 0.25f) {
+            return;
+        }
+
+        bool isTouching = false;
+        foreach (GroundContact g in groundContacts) {
+            isTouching |= g.touchingGround;
+        }
+
+        hasShouldNotTouching = false;
+        hasShouldTouching = true;
+
+        foreach (GroundContact g in shouldTouchGroundContacts) {
+            hasShouldTouching &= g.touchingGround;
+        }
+
+        if (!hasShouldTouching) {
+            AddReward(Time.fixedDeltaTime * 3.0f);
+        }
+
+        foreach (GroundContact g in shouldNotTouchGroundContacts) {
+            hasShouldNotTouching |= g.touchingGround;
+        }
+
+        if (hasShouldNotTouching) {
+            AddReward(-3.0f * Time.fixedDeltaTime);
+        }
+
+        if (!isTouching) {
+            timeOffGround += Time.fixedDeltaTime;
+            if(timeOffGround > 0.2f) {
+                AddReward(-30.0f);
+                EndEpisode();
+            }
+        } else {
+            timeOffGround = 0;
+        }
+    }
     //Returns the average velocity of all of the body parts
     //Using the velocity of the hips only has shown to result in more erratic movement from the limbs, so...
     //...using the average helps prevent this erratic movement
