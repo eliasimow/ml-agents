@@ -3458,7 +3458,7 @@ PrefabInstance:
     - target: {fileID: 52911513271127869, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_Mass
-      value: 45
+      value: 55
       objectReference: {fileID: 0}
     - target: {fileID: 103328026464094133, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -3562,8 +3562,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 537811880604324076, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
+      propertyPath: m_AngularYLimit.limit
+      value: 130
+      objectReference: {fileID: 0}
+    - target: {fileID: 537811880604324076, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
       propertyPath: m_LowAngularXLimit.limit
-      value: -177
+      value: -30
       objectReference: {fileID: 0}
     - target: {fileID: 537811880604324076, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -3628,7 +3633,7 @@ PrefabInstance:
     - target: {fileID: 818512838084078019, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_HighAngularXLimit.limit
-      value: 177
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1618390540615687582, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -3863,7 +3868,7 @@ PrefabInstance:
     - target: {fileID: 3074552036747988221, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_AngularYLimit.limit
-      value: 90
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 3074552036747988221, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -3999,6 +4004,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Drag
       value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 3766026414369013096, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: m_Mass
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3789453682512368284, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -5683,7 +5693,7 @@ PrefabInstance:
     - target: {fileID: 4815549528648299259, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_Mass
-      value: 45
+      value: 55
       objectReference: {fileID: 0}
     - target: {fileID: 4998225790407567085, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -5707,13 +5717,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5514413764015746383, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
+      propertyPath: m_AngularYLimit.limit
+      value: 130
+      objectReference: {fileID: 0}
+    - target: {fileID: 5514413764015746383, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
       propertyPath: m_LowAngularXLimit.limit
       value: -177
       objectReference: {fileID: 0}
     - target: {fileID: 5514413764015746383, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_HighAngularXLimit.limit
-      value: 177
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 5550209534252951583, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -5764,6 +5779,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AngularZMotion
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5910441211589047553, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: m_AngularYLimit.limit
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5910441211589047553, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: m_LowAngularXLimit.limit
+      value: -40
+      objectReference: {fileID: 0}
+    - target: {fileID: 5910441211589047553, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: m_HighAngularXLimit.limit
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 5959830540701353421, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -5888,7 +5918,7 @@ PrefabInstance:
     - target: {fileID: 6325420168591067766, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_AngularYLimit.limit
-      value: 90
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6325420168591067766, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -6010,6 +6040,11 @@ PrefabInstance:
       propertyPath: m_Drag
       value: 0.05
       objectReference: {fileID: 0}
+    - target: {fileID: 6496400544535053048, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: m_Mass
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 6823742422724179228, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_Enabled
@@ -6048,7 +6083,7 @@ PrefabInstance:
     - target: {fileID: 6900427590615165746, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
       propertyPath: m_LowAngularXLimit.limit
-      value: -177
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6900427590615165746, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}
@@ -6174,6 +6209,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AngularZMotion
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8204753464989377724, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: m_AngularYLimit.limit
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 8204753464989377724, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: m_LowAngularXLimit.limit
+      value: -40
+      objectReference: {fileID: 0}
+    - target: {fileID: 8204753464989377724, guid: d56c2cae65f561a45a5e2304a950d162,
+        type: 3}
+      propertyPath: m_HighAngularXLimit.limit
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 8253306798330802970, guid: d56c2cae65f561a45a5e2304a950d162,
         type: 3}

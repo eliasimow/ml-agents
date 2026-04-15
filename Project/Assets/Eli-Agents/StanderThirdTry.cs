@@ -290,6 +290,11 @@ public class StanderThirdTry : Agent {
 
         shouldNotTouchGroundContacts = new() { thighL.GetComponent<GroundContact>() , thighR.GetComponent<GroundContact>(), shinL.GetComponent<GroundContact>(), shinR.GetComponent<GroundContact>(), hips.GetComponent<GroundContact>() };
         shouldTouchGroundContacts = new() { handL.GetComponent<GroundContact>(), handR.GetComponent<GroundContact>() };
+
+        for (int i = 0; i < m_JdController.bodyPartsList.Count; i++) {
+            Debug.Log(i + " is: " + m_JdController.bodyPartsList[i].rb.name);
+        }
+
     }
 
     Quaternion SmallRandomRotation(float maxAngle) {
@@ -332,7 +337,6 @@ public class StanderThirdTry : Agent {
         // hips.rotation = Quaternion.Euler(hips.rotation.x, Random.Range(0.0f, 360.0f), hips.rotation.z);
         //  Debug.Log("Max Time was: " + maxTimeInPose +", closest was " + closest);
         // Debug.Log("Highest head was: " + highestHeadPosition);
-        Debug.Log("GOD!! Help GOD!! GOD!! " + highestHeadPosition + "  GOD !!");
 
         UpdateOrientationObjects();
 
@@ -415,38 +419,38 @@ public class StanderThirdTry : Agent {
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers) {
-        var bpDict = m_JdController.bodyPartsDict;
-        var i = -1;
+        //var bpDict = m_JdController.bodyPartsDict;
+        //var i = -1;
 
-        var continuousActions = actionBuffers.ContinuousActions;
-        bpDict[spine].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //var continuousActions = actionBuffers.ContinuousActions;
+        //bpDict[spine].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
 
-        bpDict[thighL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
-        bpDict[thighR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
-        bpDict[shinL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
-        bpDict[shinR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
-        bpDict[footR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
-        bpDict[footL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[thighL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[thighR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[shinL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[shinR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[footR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[footL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
 
-        bpDict[armL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
-        bpDict[armR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
-        bpDict[forearmL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
-        bpDict[forearmR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
-        bpDict[head].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[armL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[armR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[forearmL].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[forearmR].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
+        //bpDict[head].SetJointTargetRotation(continuousActions[++i], continuousActions[++i], continuousActions[++i]);
 
-        //update joint strength settings
-        bpDict[spine].SetJointStrength(continuousActions[++i]);
-        bpDict[head].SetJointStrength(continuousActions[++i]);
-        bpDict[thighL].SetJointStrength(continuousActions[++i]);
-        bpDict[shinL].SetJointStrength(continuousActions[++i]);
-        bpDict[footL].SetJointStrength(continuousActions[++i]);
-        bpDict[thighR].SetJointStrength(continuousActions[++i]);
-        bpDict[shinR].SetJointStrength(continuousActions[++i]);
-        bpDict[footR].SetJointStrength(continuousActions[++i]);
-        bpDict[armL].SetJointStrength(continuousActions[++i]);
-        bpDict[forearmL].SetJointStrength(continuousActions[++i]);
-        bpDict[armR].SetJointStrength(continuousActions[++i]);
-        bpDict[forearmR].SetJointStrength(continuousActions[++i]);
+        ////update joint strength settings
+        //bpDict[spine].SetJointStrength(continuousActions[++i]);
+        //bpDict[head].SetJointStrength(continuousActions[++i]);
+        //bpDict[thighL].SetJointStrength(continuousActions[++i]);
+        //bpDict[shinL].SetJointStrength(continuousActions[++i]);
+        //bpDict[footL].SetJointStrength(continuousActions[++i]);
+        //bpDict[thighR].SetJointStrength(continuousActions[++i]);
+        //bpDict[shinR].SetJointStrength(continuousActions[++i]);
+        //bpDict[footR].SetJointStrength(continuousActions[++i]);
+        //bpDict[armL].SetJointStrength(continuousActions[++i]);
+        //bpDict[forearmL].SetJointStrength(continuousActions[++i]);
+        //bpDict[armR].SetJointStrength(continuousActions[++i]);
+        //bpDict[forearmR].SetJointStrength(continuousActions[++i]);
     }
 
     //Update OrientationCube and DirectionIndicator
@@ -458,7 +462,8 @@ public class StanderThirdTry : Agent {
         }
     }
 
-    //Vector3 currentEuler = new Vector3();
+    public Vector3 desiredEuler = new Vector3();
+    public int targetJoint;
     //float rotationSpeed = 1.0f;
     void FixedUpdate() {
         //    Vector3 input = new Vector3(
@@ -474,13 +479,11 @@ public class StanderThirdTry : Agent {
         //currentEuler.x += v * rotationSpeed * Time.fixedDeltaTime; // pitch
         //currentEuler.y += h * rotationSpeed * Time.fixedDeltaTime; // yaw
 
-        //var bpDict = m_JdController.bodyPartsDict;
-        //Debug.Log("is " + currentEuler.x + "," + currentEuler.y + "," + currentEuler.z);
-        //bpDict[shinR].SetJointTargetRotation(currentEuler.x, currentEuler.y, currentEuler.z);
-        //bpDict[shinR].SetJointStrength(1.0f);
+        var bpDict = m_JdController.bodyPartsList;
+        Debug.Log("is: " + bpDict[targetJoint].rb.name);
+        bpDict[targetJoint].SetJointTargetRotation(desiredEuler.x, desiredEuler.y, desiredEuler.z);
+        bpDict[targetJoint].SetJointStrength(1.0f);
         highestHeadPosition = Mathf.Max(highestHeadPosition, head.transform.position.y);
-
-
 
         UpdateOrientationObjects();
 
@@ -573,7 +576,7 @@ public class StanderThirdTry : Agent {
             timeOffGround += Time.fixedDeltaTime;
             if(timeOffGround > 0.2f) {
                 AddReward(-30.0f);
-                EndEpisode();
+     //           EndEpisode();
             }
         } else {
             timeOffGround = 0;
