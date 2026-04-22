@@ -199,6 +199,24 @@ public class StanderThirdTry : Agent {
     }
 
     [Header("Target To Walk Towards")] public Transform target; //Target the agent will walk towards during training.
+    [SerializeField] private Vector2 targetDistanceRange = new Vector2(2.5f, 7.5f);
+    [SerializeField] private float targetHeight = 0.2f;
+    [SerializeField] private float reachedTargetDistance = 1.2f;
+
+    [Header("Reward Weights")]
+    [SerializeField] private float progressRewardScale = 0.35f;
+    [SerializeField] private float closeToTargetRewardScale = 0.15f;
+    [SerializeField] private float standingRewardScale = 0.2f;
+    [SerializeField] private float notStandingPenaltyScale = -0.6f;
+    [SerializeField] private float timePenalty = -0.0015f;
+    [SerializeField] private float reachTargetBonus = 4.0f;
+    [SerializeField] private float fallPenalty = -2.0f;
+    [SerializeField] private float minStandingHeadHeight = 1.35f;
+
+    [Header("Debug Joints")]
+    public bool DEBUG_JOINTS = false;
+    [SerializeField] private float debugRotationSpeed = 120f;
+    [SerializeField] private float debugJointStrength = 1.0f;
 
     [Header("Walk Speed")]
     [Range(0.1f, 10)]
@@ -261,6 +279,7 @@ public class StanderThirdTry : Agent {
     float timeOffGround = 0.0f;
     bool hasShouldNotTouching = false;
     bool hasShouldTouching = false;
+    float previousTargetDistance = 0.0f;
 
     public override void Initialize() {
         m_OrientationCube = GetComponentInChildren<OrientationCubeController>();
@@ -339,6 +358,9 @@ public class StanderThirdTry : Agent {
         // Debug.Log("Highest head was: " + highestHeadPosition);
 
         UpdateOrientationObjects();
+        RandomizeTargetPosition();
+        UpdateOrientationObjects();
+        previousTargetDistance = HorizontalDistanceToTarget();
 
         timeInLoop = 0.0f;
         closest = 0.0f;
@@ -419,6 +441,10 @@ public class StanderThirdTry : Agent {
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers) {
+        if (DEBUG_JOINTS) {
+            return;
+        }
+
         var bpDict = m_JdController.bodyPartsDict;
         var i = -1;
 
@@ -466,35 +492,28 @@ public class StanderThirdTry : Agent {
     public int targetJoint;
     //float rotationSpeed = 1.0f;
     void FixedUpdate() {
-        //    Vector3 input = new Vector3(
-        //    Input.GetAxis("Horizontal"),
-        //    0,
-        //    Input.GetAxis("Vertical")
-        //);
+        if (DEBUG_JOINTS) {
+            float h = Input.GetAxis("Horizontal");
+            float v = Input.GetAxis("Vertical");
 
-        //float h = Input.GetAxis("Horizontal"); // A/D
-        //float v = Input.GetAxis("Vertical");   // W/S
+            desiredEuler.x += v * debugRotationSpeed * Time.fixedDeltaTime;
+            desiredEuler.y += h * debugRotationSpeed * Time.fixedDeltaTime;
 
-        //// Update rotation
-        //currentEuler.x += v * rotationSpeed * Time.fixedDeltaTime; // pitch
-        //currentEuler.y += h * rotationSpeed * Time.fixedDeltaTime; // yaw
+            var bodyParts = m_JdController.bodyPartsList;
+            int clampedTargetJoint = Mathf.Clamp(targetJoint, 0, bodyParts.Count - 1);
+            bodyParts[clampedTargetJoint].SetJointTargetRotation(desiredEuler.x, desiredEuler.y, desiredEuler.z);
+            bodyParts[clampedTargetJoint].SetJointStrength(debugJointStrength);
+        }
 
-      // var bpDict = m_JdController.bodyPartsList;
-       // Debug.Log("is: " + bpDict[targetJoint].rb.name);
-        //bpDict[targetJoint].SetJointTargetRotation(desiredEuler.x, desiredEuler.y, desiredEuler.z);
-        //bpDict[targetJoint].SetJointStrength(1.0f);
         highestHeadPosition = Mathf.Max(highestHeadPosition, head.transform.position.y);
 
         UpdateOrientationObjects();
 
         timeInLoop += Time.fixedDeltaTime;
-        
-        //AddReward(GetPoseTrackingReward(Time.fixedDeltaTime, 1) * 5.0f);
-        //CheckPoseCompletion(0);
 
-        AddHeightReward();
+        ApplyTargetReward();
+        ApplyStandingRewardAndPenalties();
         EndIfNotTouching();
-        return;
 
         /*
         var cubeForward = m_OrientationCube.transform.forward;
@@ -541,6 +560,57 @@ public class StanderThirdTry : Agent {
         }
 
         AddReward(Mathf.Pow(head.transform.position.y,3) * Time.fixedDeltaTime * 2.5f);
+    }
+
+    void RandomizeTargetPosition() {
+        if (target == null) {
+            return;
+        }
+
+        float randomDistance = Random.Range(targetDistanceRange.x, targetDistanceRange.y);
+        float randomAngle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+        Vector3 randomOffset = new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle)) * randomDistance;
+        target.position = hips.position + randomOffset;
+        target.position = new Vector3(target.position.x, targetHeight, target.position.z);
+    }
+
+    float HorizontalDistanceToTarget() {
+        Vector3 flatToTarget = target.position - hips.position;
+        flatToTarget.y = 0f;
+        return flatToTarget.magnitude;
+    }
+
+    void ApplyTargetReward() {
+        if (target == null) {
+            return;
+        }
+
+        float currentDistance = HorizontalDistanceToTarget();
+        float distanceDelta = previousTargetDistance - currentDistance;
+        AddReward(distanceDelta * progressRewardScale);
+        AddReward(Mathf.Clamp01(1f - (currentDistance / targetDistanceRange.y)) * closeToTargetRewardScale * Time.fixedDeltaTime);
+        AddReward(timePenalty);
+
+        if (currentDistance <= reachedTargetDistance) {
+            AddReward(reachTargetBonus);
+            EndEpisode();
+        }
+
+        previousTargetDistance = currentDistance;
+    }
+
+    void ApplyStandingRewardAndPenalties() {
+        float standingRatio = Mathf.Clamp01(head.position.y / minStandingHeadHeight);
+        AddReward(standingRatio * standingRewardScale * Time.fixedDeltaTime);
+
+        if (head.position.y < minStandingHeadHeight * 0.7f) {
+            AddReward(notStandingPenaltyScale * Time.fixedDeltaTime);
+        }
+
+        if (head.position.y < 0.75f) {
+            AddReward(fallPenalty);
+            EndEpisode();
+        }
     }
 
     void EndIfNotTouching() {
