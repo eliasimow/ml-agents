@@ -328,7 +328,7 @@ public class StanderThirdTry : Agent {
             bodyPart.Reset(bodyPart);
         }
 
-        ToReferencePose();
+        ResetPose();
 
 
         //float maxAngle = 145.0f;
@@ -511,11 +511,6 @@ public class StanderThirdTry : Agent {
 
         timeInLoop += Time.fixedDeltaTime;
 
-        ApplyTargetReward();
-        ApplyStandingRewardAndPenalties();
-        EndIfNotTouching();
-
-        /*
         var cubeForward = m_OrientationCube.transform.forward;
 
         // Set reward for this step according to mixture of the following elements.
@@ -550,7 +545,6 @@ public class StanderThirdTry : Agent {
         }
 
         AddReward(matchSpeedReward * lookAtTargetReward);
-        */
     }
 
     void AddHeightReward() {

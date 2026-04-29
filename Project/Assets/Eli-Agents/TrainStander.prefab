@@ -3151,7 +3151,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 0}
-  agentDoneOnGroundContact: 0
+  agentDoneOnGroundContact: 1
   penalizeGroundContact: 1
   groundContactPenalty: 2
   touchingGround: 0
@@ -3180,7 +3180,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 0}
-  agentDoneOnGroundContact: 0
+  agentDoneOnGroundContact: 1
   penalizeGroundContact: 1
   groundContactPenalty: 2
   touchingGround: 0
