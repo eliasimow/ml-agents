@@ -202,6 +202,10 @@ public class StanderThirdTry : Agent {
     [SerializeField] private Vector2 targetDistanceRange = new Vector2(2.5f, 7.5f);
     [SerializeField] private float targetHeight = 0.2f;
     [SerializeField] private float reachedTargetDistance = 1.2f;
+    [Tooltip("Optional world-space anchor for random target placement. If unset, uses the agent hips position after each episode reset.")]
+    [SerializeField] private Transform targetSpawnCenter;
+    [Tooltip("Targets are placed at most this horizontal distance from the spawn center (clamped with target distance range).")]
+    [SerializeField] private float targetSpawnMaxRadius = 7.5f;
 
     [Header("Reward Weights")]
     [SerializeField] private float progressRewardScale = 0.35f;
@@ -280,6 +284,7 @@ public class StanderThirdTry : Agent {
     bool hasShouldNotTouching = false;
     bool hasShouldTouching = false;
     float previousTargetDistance = 0.0f;
+    Vector3 m_TargetSpawnOriginWorld;
 
     public override void Initialize() {
         m_OrientationCube = GetComponentInChildren<OrientationCubeController>();
@@ -314,6 +319,7 @@ public class StanderThirdTry : Agent {
             Debug.Log(i + " is: " + m_JdController.bodyPartsList[i].rb.name);
         }
 
+        m_TargetSpawnOriginWorld = hips.position;
     }
 
     Quaternion SmallRandomRotation(float maxAngle) {
@@ -357,6 +363,7 @@ public class StanderThirdTry : Agent {
         //  Debug.Log("Max Time was: " + maxTimeInPose +", closest was " + closest);
         // Debug.Log("Highest head was: " + highestHeadPosition);
 
+        m_TargetSpawnOriginWorld = hips.position;
         UpdateOrientationObjects();
         RandomizeTargetPosition();
         UpdateOrientationObjects();
@@ -509,6 +516,14 @@ public class StanderThirdTry : Agent {
 
         UpdateOrientationObjects();
 
+        float distToTarget = HorizontalDistanceToTarget();
+        if (target != null && distToTarget <= reachedTargetDistance && previousTargetDistance > reachedTargetDistance) {
+            AddReward(reachTargetBonus);
+            RandomizeTargetPosition();
+            UpdateOrientationObjects();
+            distToTarget = HorizontalDistanceToTarget();
+        }
+
         timeInLoop += Time.fixedDeltaTime;
 
         var cubeForward = m_OrientationCube.transform.forward;
@@ -545,6 +560,8 @@ public class StanderThirdTry : Agent {
         }
 
         AddReward(matchSpeedReward * lookAtTargetReward);
+
+        previousTargetDistance = distToTarget;
     }
 
     void AddHeightReward() {
@@ -556,16 +573,30 @@ public class StanderThirdTry : Agent {
         AddReward(Mathf.Pow(head.transform.position.y,3) * Time.fixedDeltaTime * 2.5f);
     }
 
+    Vector3 GetTargetSpawnCenterWorld() {
+        if (targetSpawnCenter != null) {
+            return targetSpawnCenter.position;
+        }
+
+        return m_TargetSpawnOriginWorld;
+    }
+
     void RandomizeTargetPosition() {
         if (target == null) {
             return;
         }
 
-        float randomDistance = Random.Range(targetDistanceRange.x, targetDistanceRange.y);
+        Vector3 center = GetTargetSpawnCenterWorld();
+        float maxRadius = Mathf.Min(targetDistanceRange.y, targetSpawnMaxRadius);
+        float minRadius = Mathf.Min(targetDistanceRange.x, maxRadius);
+        if (minRadius > maxRadius) {
+            (minRadius, maxRadius) = (maxRadius, minRadius);
+        }
+
+        float randomDistance = Random.Range(minRadius, maxRadius);
         float randomAngle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-        Vector3 randomOffset = new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle)) * randomDistance;
-        target.position = hips.position + randomOffset;
-        target.position = new Vector3(target.position.x, targetHeight, target.position.z);
+        Vector3 flat = center + new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle)) * randomDistance;
+        target.position = new Vector3(flat.x, targetHeight, flat.z);
     }
 
     float HorizontalDistanceToTarget() {
@@ -587,7 +618,8 @@ public class StanderThirdTry : Agent {
 
         if (currentDistance <= reachedTargetDistance) {
             AddReward(reachTargetBonus);
-            EndEpisode();
+            RandomizeTargetPosition();
+            UpdateOrientationObjects();
         }
 
         previousTargetDistance = currentDistance;
