@@ -222,6 +222,12 @@ public class StanderThirdTry : Agent {
     [SerializeField] private float debugRotationSpeed = 120f;
     [SerializeField] private float debugJointStrength = 1.0f;
 
+    [Header("Debug Target Angle")]
+    [SerializeField] private bool debugControlTargetAngle = false;
+    [SerializeField] private float debugTargetAngleSpeedDegPerSec = 120f;
+    [SerializeField] private float debugTargetAngleDeg = 0f;
+    [SerializeField] private float debugTargetStartDistance = 4f;
+
     [Header("Walk Speed")]
     [Range(0.1f, 10)]
     [SerializeField]
@@ -368,6 +374,7 @@ public class StanderThirdTry : Agent {
         RandomizeTargetPosition();
         UpdateOrientationObjects();
         previousTargetDistance = HorizontalDistanceToTarget();
+        debugTargetStartDistance = Mathf.Max(0.5f, previousTargetDistance);
 
         timeInLoop = 0.0f;
         closest = 0.0f;
@@ -495,10 +502,28 @@ public class StanderThirdTry : Agent {
         }
     }
 
+    void UpdateDebugTargetFromAngle() {
+        if (target == null) {
+            return;
+        }
+
+        float rad = debugTargetAngleDeg * Mathf.Deg2Rad;
+        Vector3 offset = new Vector3(Mathf.Cos(rad), 0f, Mathf.Sin(rad)) * debugTargetStartDistance;
+        Vector3 center = hips.position;
+        target.position = new Vector3(center.x + offset.x, targetHeight, center.z + offset.z);
+    }
+
     public Vector3 desiredEuler = new Vector3();
     public int targetJoint;
     //float rotationSpeed = 1.0f;
     void FixedUpdate() {
+        if (debugControlTargetAngle) {
+            float h = Input.GetAxis("Horizontal");
+            debugTargetAngleDeg += h * debugTargetAngleSpeedDegPerSec * Time.fixedDeltaTime;
+            debugTargetAngleDeg = Mathf.Repeat(debugTargetAngleDeg, 360f);
+            UpdateDebugTargetFromAngle();
+        }
+
         if (DEBUG_JOINTS) {
             float h = Input.GetAxis("Horizontal");
             float v = Input.GetAxis("Vertical");
